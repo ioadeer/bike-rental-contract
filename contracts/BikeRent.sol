@@ -118,6 +118,8 @@ contract BikeRent is AccessControl {
    lockedCollateral[address(msg.sender)] = collateral.add(addressCollateral);
    uint256 rentPrice = uint256(msg.value).sub(_bike.collateral);
    _renter.transfer(rentPrice);
+   _bike.available = false;
+   bikes[_id] = _bike;
    bikeRentals[bikeRentalsCount] = BikeRental(
                                               bikeRentalsCount,
                                               _renter,
@@ -141,6 +143,9 @@ contract BikeRent is AccessControl {
    _bikeRental.renterReturnApproval = true;
    bikeRentals[_id] = _bikeRental;
    if( _bikeRental.renterReturnApproval && _bikeRental.renteeReturnApproval) {
+     Bike memory _bike = bikes[_bikeRental.bike_id];
+     _bike.available = true; 
+     bikes[_bikeRental.bike_id] = _bike;
      emit BikeReturned(
                       _bikeRental.renter,
                       _bikeRental.rentee,
@@ -158,6 +163,9 @@ contract BikeRent is AccessControl {
    _bikeRental.renteeReturnApproval = true;
    bikeRentals[_id] = _bikeRental;
    if( _bikeRental.renterReturnApproval && _bikeRental.renteeReturnApproval) {
+     Bike memory _bike = bikes[_bikeRental.bike_id];
+     _bike.available = true; 
+     bikes[_bikeRental.bike_id] = _bike;
      emit BikeReturned(
                       _bikeRental.renter,
                       _bikeRental.rentee,

@@ -6,35 +6,33 @@ import Web3 from 'web3';
 
 import {
   useDispatch,
+  useStore,
 } from 'react-redux';
 
-import TutorialToken from './contracts/TutorialToken.json';
+import BikeRent from './contracts/BikeRent.json';
 
 import {
   setUserAddress,
   setIsAdmin,
-  setMinterKey,
-  setBurnerKey,
-  setIsMinter,
-  setIsBurner,
 } from './actions/UserActions';
+
+import {
+  setBike,
+} from './actions/BikeActions';
 
 import NavBar from './components/NavBar';
 import AdminRole from './components/AdminRole';
 
 function Home() {
   const dispatch = useDispatch();
+  const user = useStore((store) => store.user);
   const [ethBrowserError, setEthBrowserError] = useState(null);
   const [ethContractError, setEthContractError] = useState(null);
   const [account, setAccount] = useState(null);
-  const [tutorialToken, setTutorialToken] = useState(null);
+  const [bikeRentalContract, setBikeRentalContract] = useState(null);
   const [contractAddress, setContractAddress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adminRole, setAdminRole] = useState(false);
-  const [burnerRole, setBurnerRole] = useState(false);
-  const [burnerRoleKey, setBurnerRoleKey] = useState('');
-  const [minterRole, setMinterRole] = useState(false);
-  const [minterRoleKey, setMinterRoleKey] = useState('');
   const [init, setInit] = useState(false);
 
   async function loadWeb3() {
@@ -48,39 +46,44 @@ function Home() {
     }
   }
 
+  async function fetchBikes(bikeRentalInstance) {
+    if (bikeRentalInstance) {
+      const bikeCount = await bikeRentalInstance.methods.bikeCount().call();
+      const promises = [];
+      for (let i = 0; i < bikeCount; i += 1) {
+        promises.push(bikeRentalInstance.methods.bikes(i).call());
+      }
+      Promise.all(promises).then((values) => {
+        for (let i = 0; i < values.length; i += 1) {
+          dispatch(setBike(values[i]));
+        }
+      });
+    }
+  }
+
   async function loadBlockChainData() {
     const { web3 } = window;
     const accounts = await web3.eth.getAccounts();
     setAccount(accounts[0]);
     dispatch(setUserAddress(accounts[0]));
     const netWorkId = await web3.eth.net.getId();
-    const netWorkData = TutorialToken.networks[netWorkId];
+    const netWorkData = BikeRent.networks[netWorkId];
     if (netWorkData) {
-      const tutorialTokenInstance = new web3.eth.Contract(TutorialToken.abi, netWorkData.address);
-      setTutorialToken(tutorialTokenInstance);
-      const { _address } = tutorialTokenInstance;
-      const tempAdminRole = await tutorialTokenInstance.methods.DEFAULT_ADMIN_ROLE().call();
-      const hasAdminRole = await tutorialTokenInstance.methods.hasRole(tempAdminRole, accounts[0]).call();
+      const bikeRentalInstance = new web3.eth.Contract(BikeRent.abi, netWorkData.address);
+      setBikeRentalContract(bikeRentalInstance);
+      const { _address } = bikeRentalInstance;
+      const tempAdminRole = await bikeRentalInstance.methods.DEFAULT_ADMIN_ROLE().call();
+      const hasAdminRole = await bikeRentalInstance.methods.hasRole(tempAdminRole, accounts[0]).call();
       dispatch(setIsAdmin(hasAdminRole));
       setAdminRole(hasAdminRole);
-      const tempMinterRole = await tutorialTokenInstance.methods.MINTER_ROLE().call();
-      setMinterRoleKey(tempMinterRole);
-      dispatch(setMinterKey(tempMinterRole));
-      const hasMinterRole = await tutorialTokenInstance.methods.hasRole(tempMinterRole, accounts[0]).call();
-      setMinterRole(hasMinterRole);
-      dispatch(setIsMinter(hasMinterRole));
-      const tempBurnerRole = await tutorialTokenInstance.methods.BURNER_ROLE().call();
-      setBurnerRoleKey(tempBurnerRole);
-      dispatch(setBurnerKey(tempBurnerRole));
-      const hasBurnerRole = await tutorialTokenInstance.methods.hasRole(tempBurnerRole, accounts[0]).call();
-      setBurnerRole(hasBurnerRole);
-      dispatch(setIsBurner(hasBurnerRole));
       setContractAddress(_address);
+      fetchBikes(bikeRentalInstance);
       setLoading(false);
     } else {
-      setEthContractError('TutorialToken not deployed to detected network');
+      setEthContractError('BikeRent not deployed to detected network');
     }
   }
+
   useEffect(() => {
     if (!init) {
       loadWeb3();
@@ -91,6 +94,14 @@ function Home() {
       console.log('Desmontando blockchain ...');
     };
   }, [init]);
+
+  // useEffect(() => {
+  //   if (init) {
+  //     fetchBikes();
+  //   }
+  //   return () => {
+  //   };
+  // }, [init]);
 
   return (
     <div className="App">
@@ -116,6 +127,13 @@ function Home() {
           />
         </>
       )}
+    </div>
+  );
+}
+
+export default Home;
+
+/*
       {adminRole && (
         <AdminRole
           tutorialToken={tutorialToken}
@@ -124,8 +142,4 @@ function Home() {
           adminAddress={account}
         />
       )}
-    </div>
-  );
-}
-
-export default Home;
+*/
