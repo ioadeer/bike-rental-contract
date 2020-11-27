@@ -40,6 +40,7 @@ contract BikeRent is AccessControl {
  }
 
  event BikeCreation (
+   uint id,
    string description,
    address owner,
    bool available,
@@ -97,8 +98,8 @@ contract BikeRent is AccessControl {
    require(_collateral> 0, "Bike must have a collateral");
    // increase bike count 
    bikes[bikeCount] = Bike(bikeCount, _description, msg.sender, _available, _rentPrice, _collateral);
+   emit BikeCreation(bikeCount,_description, msg.sender, _available, _rentPrice, _collateral);
    bikeCount ++;
-   emit BikeCreation(_description, msg.sender, _available, _rentPrice, _collateral);
  }
 
  function rentBike(uint _id) public payable {
