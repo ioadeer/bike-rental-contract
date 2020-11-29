@@ -22,7 +22,7 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
     });
   });
 
-  describe('bike', () => {
+  describe('bike creation and rental', () => {
 
     let registeredBikesCount, result;
     // Register/Create bike in blockchain
@@ -35,13 +35,13 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
       registeredBikesCount = await bikeRentInstance.bikeCount();
     });
 
-    it('creates bike', async () => {
+    it('creates bike emmits event', async () => {
       // Success
       assert.equal(registeredBikesCount, 1);
       const event = result.logs[0].args;
       assert.equal(event.id.toNumber(), 0, 'First created bike id is zero');
       assert.equal(event.description, 'Mountain bike', 'Description is correct');
-      assert.equal(event.available, true, 'Bike should be available on creation');
+      assert.isBoolean(event.available, 'Bike availability should be boolean');
       assert.equal(event.rentPrice, web3.utils.toWei('1', 'Ether'),'Bike rent price is correct');
       assert.equal(event.collateral, 
                    web3.utils.toWei('1', 'Ether'),
@@ -70,7 +70,8 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
                                         { from: renter}
                                         ).should.be.rejected;
     });
-    it('lists bikes', async () => {
+
+    it('lists bikes on public uint bikes mapping', async () => {
       // fetch first created bike
       const bike = await bikeRentInstance.bikes(0);
       assert.equal(bike.id.toNumber(), 0, 'Bike id for first created bike should be zero');
@@ -81,16 +82,36 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
                    web3.utils.toWei('1', 'Ether'),
                    'Bike rental collateral price is correct');
     });
-    it('rents bikes', async () => {
+
+    it('rents bike, emmits event, locks collateral and creates bike rent struct mapping', async () => {
+      // FAILURE 
+      // transaction should cover rent price and collateral  
+      await bikeRentInstance.rentBike(0, 
+                                     { from: rentee, value: web3.utils.toWei('1', 'Ether')}
+                                     ).should.be.rejected;
+
+      // transaction should not exceed rent price and collateral  
+      await bikeRentInstance.rentBike(0, 
+                                     { from: rentee, value: web3.utils.toWei('3', 'Ether')}
+                                     ).should.be.rejected;
+      // renter should not be allowed to rent his own bike 
+      await bikeRentInstance.rentBike(0, 
+                                     { from: renter, value: web3.utils.toWei('2', 'Ether')}
+                                     ).should.be.rejected;
+      // bike to be rented should exist 
+      await bikeRentInstance.rentBike(99, 
+                                     { from: renter, value: web3.utils.toWei('2', 'Ether')}
+                                     ).should.be.rejected;
+
       let initialRenterBalance, finalRenterBalance;
-      let lockedCollateral;
 
       initialRenterBalance = await web3.eth.getBalance(renter);
       initialRenterBalance = new web3.utils.BN(initialRenterBalance);
-
+      
       // SUCCESS
       result = await bikeRentInstance.rentBike(0, { from: rentee, value: web3.utils.toWei('2', 'Ether')});
 
+      // Bike rented event
       const event = result.logs[0].args;
       assert.equal(event.renter, renter, 'Renter address should be logged in event');
       assert.equal(event.rentee, rentee, 'Rentee address should be logged in event');
@@ -103,6 +124,56 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
                    web3.utils.toWei('1','Ether'), 
                    'Collateral price is correct'
                   );
+
+      // check that renter received balance
+      finalRenterBalance = await web3.eth.getBalance(renter);
+      finalRenterBalance = new web3.utils.BN(finalRenterBalance);
+
+      let price;
+      price = web3.utils.toWei('1', 'Ether');
+      price = new web3.utils.BN(price);
+
+      const expectedBalance = initialRenterBalance.add(price);
+
+      assert.equal(finalRenterBalance.toString(), expectedBalance.toString());
+
+      // retrieve bike rental from mapping
+      const bikeRental = await bikeRentInstance.bikeRentals(0);
+      assert.equal(bikeRental.id.toNumber(), 0, 'Id for first created bike rental should be zero');
+      assert.equal(bikeRental.renter, renter, 'Bike rental renter should be bike renter'); 
+      assert.equal(bikeRental.rentee, rentee, 'Bike rental rentee should be bike rentee'); 
+      assert.equal(bikeRental.bike_id, 0, 'Rented bike_id should be first created bike');
+      assert.equal(
+                  bikeRental.rentPrice, 
+                  web3.utils.toWei('1', 'Ether'), 
+                  'Stored rental price is correct'
+                  );
+      assert.equal(
+                  bikeRental.rentPrice, 
+                  web3.utils.toWei('1', 'Ether'), 
+                  'Stored collateral is correct'
+                  );
+      assert.isFalse(bikeRental.renterReturnApproval, 'Renter return approval should be initially false');
+      assert.isFalse(bikeRental.renteeReturnApproval, 'Rentee return approval should be initially false');
+
+      // check collateral stored during bike rental transaction
+      let lockedRenteeLockedCollateral = await bikeRentInstance.lockedCollateral(rentee);
+      let expectedRenteeLockedCollateral = new web3.utils.BN(web3.utils.toWei('1', 'Ether'));
+
+      assert.equal(
+                  lockedRenteeLockedCollateral.toString(), 
+                  expectedRenteeLockedCollateral.toString(),
+                  'Locked rentee collateral should equal collateral sent on transaction'
+                  );
+      // Failure after rental before return
+      // bike should not be available after rental
+      await bikeRentInstance.rentBike(0, 
+                                     { from: rentee, value: web3.utils.toWei('2', 'Ether')}
+                                     ).should.be.rejected;
     });
+  });
+
+  it('returns bikes', async () => {
+
   });
 });

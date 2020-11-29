@@ -105,6 +105,8 @@ contract BikeRent is AccessControl {
  function rentBike(uint _id) public payable {
    // fetch bike
    Bike memory _bike = bikes[_id];
+   // make sure that bike exist checkin bike id
+   require(_bike.id >= 0 && _bike.id < bikeCount, "Bike id not valid");
    // check if bike is available for rent 
    require(_bike.available, "Oops, bike is not available");
    // check if transaction can cover collateral and rent price
