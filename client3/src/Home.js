@@ -20,8 +20,13 @@ import {
   setBike,
 } from './actions/BikeActions';
 
+import {
+  setContract,
+} from './actions/ContractActions';
+
 import NavBar from './components/NavBar';
 import AdminRole from './components/AdminRole';
+import CreateBikeForm from './components/CreateBikeForm';
 
 function Home() {
   const dispatch = useDispatch();
@@ -71,6 +76,7 @@ function Home() {
     if (netWorkData) {
       const bikeRentalInstance = new web3.eth.Contract(BikeRent.abi, netWorkData.address);
       setBikeRentalContract(bikeRentalInstance);
+      dispatch(setContract(bikeRentalInstance));
       const { _address } = bikeRentalInstance;
       const tempAdminRole = await bikeRentalInstance.methods.DEFAULT_ADMIN_ROLE().call();
       const hasAdminRole = await bikeRentalInstance.methods.hasRole(tempAdminRole, accounts[0]).call();
@@ -125,6 +131,7 @@ function Home() {
           <NavBar
             contractAddress={contractAddress}
           />
+          <CreateBikeForm />
         </>
       )}
     </div>
