@@ -12,31 +12,30 @@ function NavBar({
   } = useSelector((state) => state.UserReducer);
   return (
     <nav>
-      <ul>
-        <li>
-          Hola!&nbsp;
-          { address }
-        </li>
-        {admin && (
+      <div className="nav-wrapper">
+        <a href="#" className="brand-logo">Bike Rent!</a>
+        <ul id="nav-mobile" className="right hide-on-med-and-down">
           <li>
-            Sos admin!
+            Hola!&nbsp;
+            { address }
           </li>
-        )}
-        {minter && (
-          <li>
-            Sos minter!
-          </li>
-        )}
-        {burner && (
-          <li>
-            Sos burner!
-          </li>
-        )}
-        <li>
-          Contrato&nbsp;
-          { contractAddress }
-        </li>
-      </ul>
+          {admin && (
+            <li>
+              Sos admin!
+            </li>
+          )}
+          {minter && (
+            <li>
+              Sos minter!
+            </li>
+          )}
+          {burner && (
+            <li>
+              Sos burner!
+            </li>
+          )}
+        </ul>
+      </div>
     </nav>
   );
 }

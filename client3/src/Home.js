@@ -131,7 +131,9 @@ function Home() {
           <NavBar
             contractAddress={contractAddress}
           />
-          <CreateBikeForm />
+          <div className="container">
+            <CreateBikeForm />
+          </div>
         </>
       )}
     </div>
