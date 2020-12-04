@@ -6,6 +6,7 @@ import {
   Route,
   BrowserRouter as Router,
   Switch,
+  useHistory,
 } from 'react-router-dom';
 
 import Web3 from 'web3';
@@ -29,6 +30,7 @@ import {
   setContract,
 } from './actions/ContractActions';
 
+import Landing from './screens/Landing';
 import NavBar from './components/NavBar';
 import CreateBikeForm from './components/CreateBikeForm';
 import RentBike from './components/RentBike';
@@ -131,6 +133,9 @@ function Home() {
           <Router>
             <NavBar />
             <Switch>
+              <Route exact path="/">
+                <Landing />
+              </Route>
               <Route path="/create-bike">
                 <CreateBikeForm />
               </Route>
@@ -146,14 +151,3 @@ function Home() {
 }
 
 export default Home;
-
-/*
-      {adminRole && (
-        <AdminRole
-          tutorialToken={tutorialToken}
-          minterRoleKey={minterRoleKey}
-          burnerRoleKey={burnerRoleKey}
-          adminAddress={account}
-        />
-      )}
-*/

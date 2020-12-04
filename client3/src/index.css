@@ -1,0 +1,21 @@
+html, body {margin: 0; height: 100%; overflow: hidden}
+
+.main-menu-item {
+  height: 50%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.main-menu-item{
+  color: #455a64;
+}
+
+.main-menu-item:hover{
+  color: #000000;
+}
+
+.main-menu-item:hover {
+  background-color: #f5f5f5; 
+}

@@ -16,7 +16,8 @@ function NavBar() {
   return (
     <nav>
       <div className="nav-wrapper">
-        <a href="#"
+        <a
+          href="#"
           className="brand-logo"
           style={{
             paddingLeft: '1em',
@@ -31,6 +32,15 @@ function NavBar() {
             paddingRight: '1em',
           }}
         >
+          <li>
+            <Link to="/">
+              <span>
+                <i className="material-icons">
+                  home
+                </i>
+              </span>
+            </Link>
+          </li>
           <li>
             <Link to="/create-bike">
               Create Bike
