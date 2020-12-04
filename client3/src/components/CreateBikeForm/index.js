@@ -83,7 +83,7 @@ function CreateBikeForm() {
   }
 
   return (
-    <>
+    <div className="container">
       <div className="row">
         <div className="col s3" />
         <div className="col s6">
@@ -198,7 +198,7 @@ function CreateBikeForm() {
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

@@ -2,6 +2,14 @@ import React, {
   useState,
   useEffect,
 } from 'react';
+
+import {
+  Route,
+  BrowserRouter as Router,
+  Switch,
+  Link,
+} from 'react-router-dom';
+
 import Web3 from 'web3';
 
 import {
@@ -27,6 +35,7 @@ import {
 import NavBar from './components/NavBar';
 import AdminRole from './components/AdminRole';
 import CreateBikeForm from './components/CreateBikeForm';
+import RentBike from './components/RentBike';
 
 function Home() {
   const dispatch = useDispatch();
@@ -36,16 +45,18 @@ function Home() {
   const [account, setAccount] = useState(null);
   const [bikeRentalContract, setBikeRentalContract] = useState(null);
   const [contractAddress, setContractAddress] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [adminRole, setAdminRole] = useState(false);
   const [init, setInit] = useState(false);
+  const [ethereumEnabled, setEthereumEneabled] = useState(false);
 
   async function loadWeb3() {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
-      await window.ethereum.enable();
-    } else if (window.web3) {
-      window.web3 = new Web3(window.web3.currentProvider);
+      // await window.ethereum.enable();
+      // window.ethereum.request({ method: 'eth_requestAccounts' });
+     } else if (window.web3) {
+       window.web3 = new Web3(window.web3.currentProvider);
     } else {
       setEthBrowserError('Non-Ethereum browser detected');
     }
@@ -69,6 +80,10 @@ function Home() {
   async function loadBlockChainData() {
     const { web3 } = window;
     const accounts = await web3.eth.getAccounts();
+    if (!web3.utils.isAddress(accounts[0])) {
+      console.log(accounts);
+      return;
+    }
     setAccount(accounts[0]);
     dispatch(setUserAddress(accounts[0]));
     const netWorkId = await web3.eth.net.getId();
@@ -84,22 +99,27 @@ function Home() {
       setAdminRole(hasAdminRole);
       setContractAddress(_address);
       fetchBikes(bikeRentalInstance);
+      setEthereumEneabled(true);
       setLoading(false);
     } else {
       setEthContractError('BikeRent not deployed to detected network');
     }
   }
 
-  useEffect(() => {
-    if (!init) {
-      loadWeb3();
-      loadBlockChainData();
-      setInit(true);
-    }
-    return () => {
-      console.log('Desmontando blockchain ...');
-    };
-  }, [init]);
+  function enableEthereum() {
+    loadWeb3();
+    loadBlockChainData();
+  }
+  //  useEffect(() => {
+  //    if (!init) {
+  //      loadWeb3();
+  //      loadBlockChainData();
+  //      setInit(true);
+  //    }
+  //    return () => {
+  //      console.log('Desmontando blockchain ...');
+  //    };
+  //  }, [init]);
 
   // useEffect(() => {
   //   if (init) {
@@ -111,6 +131,19 @@ function Home() {
 
   return (
     <div className="App">
+      {!ethereumEnabled && (
+        <div className="container valign-wrapper" style={{ height: '75vh' }}>
+          <div className="row">
+            <button
+              type="button"
+              className="btn btn-large waves-effect waves-light hoverable blue accent-3"
+              onClick={enableEthereum}
+            >
+              Enable ethereum! Ξ
+            </button>
+          </div>
+        </div>
+      )}
       {ethBrowserError && (
         <>
           <p>{ ethBrowserError }</p>
@@ -126,14 +159,19 @@ function Home() {
           <p>loading ...</p>
         </>
       )}
-      {!loading && (
+      {ethereumEnabled && (
         <>
-          <NavBar
-            contractAddress={contractAddress}
-          />
-          <div className="container">
-            <CreateBikeForm />
-          </div>
+          <Router>
+            <NavBar />
+            <Switch>
+              <Route path='/create-bike'>
+                <CreateBikeForm />
+              </Route>
+              <Route path='/rent-bike'>
+                <RentBike />
+              </Route>
+            </Switch>
+          </Router>
         </>
       )}
     </div>

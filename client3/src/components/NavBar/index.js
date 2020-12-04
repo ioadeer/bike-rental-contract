@@ -1,9 +1,13 @@
 import React from 'react';
+
+import {
+  BrowserRouter as Router,
+  Link,
+} from 'react-router-dom';
+
 import { useSelector } from 'react-redux';
 
-function NavBar({
-  contractAddress,
-}) {
+function NavBar() {
   const {
     address,
     admin,
@@ -16,12 +20,22 @@ function NavBar({
         <a href="#" className="brand-logo">Bike Rent!</a>
         <ul id="nav-mobile" className="right hide-on-med-and-down">
           <li>
+            <Link to='/create-bike'>
+              Create Bike
+            </Link>
+          </li>
+          <li>
+            <Link to='/rent-bike'>
+              Rent a bike
+            </Link>
+          </li>
+          <li>
             Hola!&nbsp;
             { address }
           </li>
           {admin && (
             <li>
-              Sos admin!
+              &nbsp;Sos admin!
             </li>
           )}
           {minter && (
