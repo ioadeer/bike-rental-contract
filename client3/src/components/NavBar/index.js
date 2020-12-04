@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {
-  BrowserRouter as Router,
   Link,
 } from 'react-router-dom';
 
@@ -17,15 +16,28 @@ function NavBar() {
   return (
     <nav>
       <div className="nav-wrapper">
-        <a href="#" className="brand-logo">Bike Rent!</a>
-        <ul id="nav-mobile" className="right hide-on-med-and-down">
+        <a href="#"
+          className="brand-logo"
+          style={{
+            paddingLeft: '1em',
+          }}
+        >
+          Bike Rent!
+        </a>
+        <ul
+          id="nav-mobile"
+          className="right hide-on-med-and-down"
+          style={{
+            paddingRight: '1em',
+          }}
+        >
           <li>
-            <Link to='/create-bike'>
+            <Link to="/create-bike">
               Create Bike
             </Link>
           </li>
           <li>
-            <Link to='/rent-bike'>
+            <Link to="/rent-bike">
               Rent a bike
             </Link>
           </li>

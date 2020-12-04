@@ -1,20 +1,17 @@
 import React, {
   useState,
-  useEffect,
 } from 'react';
 
 import {
   Route,
   BrowserRouter as Router,
   Switch,
-  Link,
 } from 'react-router-dom';
 
 import Web3 from 'web3';
 
 import {
   useDispatch,
-  useStore,
 } from 'react-redux';
 
 import BikeRent from './contracts/BikeRent.json';
@@ -33,21 +30,14 @@ import {
 } from './actions/ContractActions';
 
 import NavBar from './components/NavBar';
-import AdminRole from './components/AdminRole';
 import CreateBikeForm from './components/CreateBikeForm';
 import RentBike from './components/RentBike';
 
 function Home() {
   const dispatch = useDispatch();
-  const user = useStore((store) => store.user);
   const [ethBrowserError, setEthBrowserError] = useState(null);
   const [ethContractError, setEthContractError] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [bikeRentalContract, setBikeRentalContract] = useState(null);
-  const [contractAddress, setContractAddress] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [adminRole, setAdminRole] = useState(false);
-  const [init, setInit] = useState(false);
   const [ethereumEnabled, setEthereumEneabled] = useState(false);
 
   async function loadWeb3() {
@@ -55,8 +45,8 @@ function Home() {
       window.web3 = new Web3(window.ethereum);
       // await window.ethereum.enable();
       // window.ethereum.request({ method: 'eth_requestAccounts' });
-     } else if (window.web3) {
-       window.web3 = new Web3(window.web3.currentProvider);
+    } else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider);
     } else {
       setEthBrowserError('Non-Ethereum browser detected');
     }
@@ -84,20 +74,15 @@ function Home() {
       console.log(accounts);
       return;
     }
-    setAccount(accounts[0]);
     dispatch(setUserAddress(accounts[0]));
     const netWorkId = await web3.eth.net.getId();
     const netWorkData = BikeRent.networks[netWorkId];
     if (netWorkData) {
       const bikeRentalInstance = new web3.eth.Contract(BikeRent.abi, netWorkData.address);
-      setBikeRentalContract(bikeRentalInstance);
       dispatch(setContract(bikeRentalInstance));
-      const { _address } = bikeRentalInstance;
       const tempAdminRole = await bikeRentalInstance.methods.DEFAULT_ADMIN_ROLE().call();
       const hasAdminRole = await bikeRentalInstance.methods.hasRole(tempAdminRole, accounts[0]).call();
       dispatch(setIsAdmin(hasAdminRole));
-      setAdminRole(hasAdminRole);
-      setContractAddress(_address);
       fetchBikes(bikeRentalInstance);
       setEthereumEneabled(true);
       setLoading(false);
@@ -110,24 +95,6 @@ function Home() {
     loadWeb3();
     loadBlockChainData();
   }
-  //  useEffect(() => {
-  //    if (!init) {
-  //      loadWeb3();
-  //      loadBlockChainData();
-  //      setInit(true);
-  //    }
-  //    return () => {
-  //      console.log('Desmontando blockchain ...');
-  //    };
-  //  }, [init]);
-
-  // useEffect(() => {
-  //   if (init) {
-  //     fetchBikes();
-  //   }
-  //   return () => {
-  //   };
-  // }, [init]);
 
   return (
     <div className="App">
@@ -164,10 +131,10 @@ function Home() {
           <Router>
             <NavBar />
             <Switch>
-              <Route path='/create-bike'>
+              <Route path="/create-bike">
                 <CreateBikeForm />
               </Route>
-              <Route path='/rent-bike'>
+              <Route path="/rent-bike">
                 <RentBike />
               </Route>
             </Switch>
