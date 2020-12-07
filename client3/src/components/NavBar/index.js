@@ -43,12 +43,17 @@ function NavBar() {
           </li>
           <li>
             <Link to="/create-bike">
-              Create Bike
+              Register Bike
             </Link>
           </li>
           <li>
             <Link to="/rent-bike">
               Rent a bike
+            </Link>
+          </li>
+          <li>
+            <Link to="/my-bikes">
+              My Bikes
             </Link>
           </li>
           <li>

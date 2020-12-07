@@ -4,9 +4,21 @@ import React, {
 
 import {
   useSelector,
+  useDispatch,
 } from 'react-redux';
 
+import {
+  setSending,
+  setSuccess,
+  setError,
+  setReset,
+  setReject,
+} from '../../actions/TransactionActions';
+
+import TransactionStatusDisplay from '../TransactionStatusDisplay';
+
 function CreateBikeForm() {
+  const dispatch = useDispatch();
   const [bikeDescription, setBikeDescription] = useState('');
   const [bikeDescriptionError, setBikeDescriptionError] = useState('');
 
@@ -20,10 +32,6 @@ function CreateBikeForm() {
 
   const createBike = useSelector((state) => state.ContractReducer.methods.createBike);
   const user = useSelector((state) => state.UserReducer.address);
-
-  const [sent, setSent] = useState(false);
-  const [successTx, setSuccessTx] = useState(false);
-  const [failTx, setFailTx] = useState(false);
 
   async function submitHandle(e) {
     e.preventDefault();
@@ -52,29 +60,26 @@ function CreateBikeForm() {
       bikeCollateralValid = true;
     }
     if (bikeCollateralValid && bikeDescValid && bikeRentPriceValid) {
+      dispatch(setReset());
       createBike(bikeDescription, bikeAvailable, bikeRentPrice, collateral).send({ from: user })
-        .once('sent', () => {
-          setSent(true);
+        .once('sending', () => {
+          dispatch(setSending());
         })
         .on('error', (error) => {
-          console.log(error);
-          setSent(false);
-          setFailTx(true);
+          dispatch(setError(error));
         })
-        .on('receipt', (receipt) => {
-          setSent(false);
-          setSuccessTx(true);
-          console.log('Receipt:');
+        .then((receipt) => {
+          if (receipt.transactionHash) {
+            dispatch(setSuccess(receipt));
+            setBikeDescription('');
+            setCollateral('');
+            setBikeRentPrice('');
+          }
+          console.log('Malformed receipt ');
           console.log(receipt);
         })
-        .then((rec) => {
-          setSent(false);
-          setSuccessTx(true);
-          console.log('block mined');
-          console.log(rec);
-          setBikeDescription('');
-          setCollateral('');
-          setBikeRentPrice('');
+        .catch((error) => {
+          dispatch(setReject(error));
         });
       setBikeDescriptionError('');
       setBikeRentPriceError('');
@@ -177,27 +182,7 @@ function CreateBikeForm() {
         </div>
         <div className="col s3" />
       </div>
-      { sent && (
-        <div style={{ position: 'fixed', bottom: '10px' }}>
-          <p>
-            Sent!
-          </p>
-        </div>
-      )}
-      { successTx && (
-        <div style={{ position: 'fixed', bottom: '10px' }}>
-          <p>
-            Successful transaction!
-          </p>
-        </div>
-      )}
-      { failTx && (
-        <div style={{ position: 'fixed', bottom: '10px' }}>
-          <p>
-            Failure during transaction!
-          </p>
-        </div>
-      )}
+      <TransactionStatusDisplay />
     </div>
   );
 }

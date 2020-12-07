@@ -6,6 +6,13 @@ const setBike = (bike) => {
   }
 }
 
+const clearBikes = () => {
+  return {
+    type:'CLEAR_BIKES',
+  }
+}
+
 export {
   setBike,
+  clearBikes,
 };

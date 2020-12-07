@@ -1,17 +1,20 @@
 const initialState = {
-  sending: false,
+  sending: null,
   sent: null,
+  success: null,
   receipt: null,
   error: null,
+  reject: null,
 };
 
-const Transaction = (state = initialState, action) => {
+const TransactionReducer = (state = initialState, action) => {
   switch (action.type) {
+  case 'RESET':
+    return (initialState);
   case 'SENDING':
     return ({
       ...state,
       sending: true,
-      sent: false,
     });
   case 'SENT':
     return ({
@@ -19,9 +22,30 @@ const Transaction = (state = initialState, action) => {
       sending: false,
       sent: true,
     });
+  case 'SUCCESS':
+    return ({
+      ...state,
+      sending: false,
+      success: true,
+      receipt: action.payload,
+    });
+  case 'ERROR':
+    return ({
+      ...state,
+      sending: false,
+      error: action.payload,
+    });
+  case 'REJECT':
+    return ({
+      ...state,
+      success: false,
+      sending: false,
+      reject: true,
+      receipt: action.payload,
+    });
   default:
     return state;
   }
 };
 
-export default Transaction;
+export default TransactionReducer;

@@ -28,12 +28,12 @@ import {
 
 import TransactionStatusDisplay from '../TransactionStatusDisplay';
 
-function RentBike() {
+function MyBikes() {
   const dispatch = useDispatch();
   const [init, setInit] = useState(false);
   const userAddress = useSelector((state) => state.UserReducer.address);
   const bikes = useSelector((state) => state.BikeReducer);
-  const filteredBikes = bikes.filter((bike) => bike.owner !== userAddress);
+  const filteredBikes = bikes.filter((bike) => bike.owner === userAddress);
   const rentBike = useSelector((state) => state.ContractReducer.methods.rentBike);
   const contractInstance = useSelector((state) => state.ContractReducer);
 
@@ -73,15 +73,15 @@ function RentBike() {
     <div className="container">
       <div className="row">
         <div className="col s10 offset-s1">
-          <h1>Rent a bike</h1>
-          {bikes && (
+          <h1>My bikes</h1>
+          {filteredBikes && (
             <table className="bordered centered highlight responsive-table">
               <thead>
                 <tr>
                   <th>Description</th>
                   <th>Price</th>
                   <th>Collateral</th>
-                  <th>Owner</th>
+                  <th>Available</th>
                 </tr>
               </thead>
               <tbody>
@@ -98,26 +98,27 @@ function RentBike() {
                       &nbsp;
                       <i>wei</i>
                     </td>
-                    <td>{bike.owner}</td>
                     {bike.available && (
-                      <button
-                        type="button"
-                        onClick={() => bikeRentHandle(bike.bike_id, bike.rent_price, bike.collateral)}
-                        className="btn btn-large btn-flat waves-effect white black-text"
-                        style={{
-                          marginRight: '0px',
-                        }}
-                      >
-                        Rent
-                      </button>
+                      <td>
+                        <i className="material-icons">
+                          done
+                        </i>
+                      </td>
+                    )}
+                    {!bike.available && (
+                      <td>
+                        <i className="material-icons">
+                          do_not_disturb_on
+                        </i>
+                      </td>
                     )}
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
-          {!bikes && (
-            <p>No bikes registered!</p>
+          {!filteredBikes && (
+            <p>No bikes registered by this address!</p>
           )}
         </div>
       </div>
@@ -126,7 +127,7 @@ function RentBike() {
   );
 }
 
-export default RentBike;
+export default MyBikes;
 
 /*
             */

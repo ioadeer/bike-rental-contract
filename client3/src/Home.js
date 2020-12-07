@@ -6,7 +6,6 @@ import {
   Route,
   BrowserRouter as Router,
   Switch,
-  useHistory,
 } from 'react-router-dom';
 
 import Web3 from 'web3';
@@ -23,10 +22,6 @@ import {
 } from './actions/UserActions';
 
 import {
-  setBike,
-} from './actions/BikeActions';
-
-import {
   setContract,
 } from './actions/ContractActions';
 
@@ -34,6 +29,7 @@ import Landing from './screens/Landing';
 import NavBar from './components/NavBar';
 import CreateBikeForm from './components/CreateBikeForm';
 import RentBike from './components/RentBike';
+import MyBikes from './components/MyBikes';
 
 function Home() {
   const dispatch = useDispatch();
@@ -46,26 +42,11 @@ function Home() {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
       // await window.ethereum.enable();
-      // window.ethereum.request({ method: 'eth_requestAccounts' });
+      window.ethereum.request({ method: 'eth_requestAccounts' });
     } else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
     } else {
       setEthBrowserError('Non-Ethereum browser detected');
-    }
-  }
-
-  async function fetchBikes(bikeRentalInstance) {
-    if (bikeRentalInstance) {
-      const bikeCount = await bikeRentalInstance.methods.bikeCount().call();
-      const promises = [];
-      for (let i = 0; i < bikeCount; i += 1) {
-        promises.push(bikeRentalInstance.methods.bikes(i).call());
-      }
-      Promise.all(promises).then((values) => {
-        for (let i = 0; i < values.length; i += 1) {
-          dispatch(setBike(values[i]));
-        }
-      });
     }
   }
 
@@ -85,7 +66,6 @@ function Home() {
       const tempAdminRole = await bikeRentalInstance.methods.DEFAULT_ADMIN_ROLE().call();
       const hasAdminRole = await bikeRentalInstance.methods.hasRole(tempAdminRole, accounts[0]).call();
       dispatch(setIsAdmin(hasAdminRole));
-      fetchBikes(bikeRentalInstance);
       setEthereumEneabled(true);
       setLoading(false);
     } else {
@@ -141,6 +121,9 @@ function Home() {
               </Route>
               <Route path="/rent-bike">
                 <RentBike />
+              </Route>
+              <Route path="/my-bikes">
+                <MyBikes />
               </Route>
             </Switch>
           </Router>

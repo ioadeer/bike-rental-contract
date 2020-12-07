@@ -22,6 +22,8 @@ const BikeReducer = ( initialState = [], action) =>{
   switch(action.type){
     case 'SET_BIKE':
       return [...initialState, Bike(null, action)];
+    case 'CLEAR_BIKES':
+      return [];
     default:
       return initialState;
   }
