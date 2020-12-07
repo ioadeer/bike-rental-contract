@@ -27,7 +27,7 @@ function Landing() {
         <button
           type="button"
           className="btn btn-flat black-text main-menu-button"
-          onClick={() => history.push('/register-bike')}
+          onClick={() => history.push('/create-bike')}
         >
           REGISTER BIKE
         </button>
@@ -35,12 +35,24 @@ function Landing() {
       <div
         className="col s6 main-menu-item"
       >
-        <h1>MY RENTALS</h1>
+        <button
+          type="button"
+          className="btn btn-flat black-text main-menu-button"
+          onClick={() => history.push('/create-bike')}
+        >
+          MY RENTALS
+        </button>
       </div>
       <div
         className="col s6 main-menu-item"
       >
-        <h1>MY BIKES</h1>
+        <button
+          type="button"
+          className="btn btn-flat black-text main-menu-button"
+          onClick={() => history.push('/my-bikes')}
+        >
+          MY BIKES
+        </button>
       </div>
     </div>
   );

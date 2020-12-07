@@ -2,6 +2,7 @@ import store from '../store';
 
 import {
   setBike,
+  setBikes,
 } from '../actions/BikeActions';
 
 export async function fetchBikes(bikeRentalInstance) {
@@ -12,9 +13,10 @@ export async function fetchBikes(bikeRentalInstance) {
       promises.push(bikeRentalInstance.methods.bikes(i).call());
     }
     Promise.all(promises).then((values) => {
-      for (let i = 0; i < values.length; i += 1) {
-        store.dispatch(setBike(values[i]));
-      }
+      // for (let i = 0; i < values.length; i += 1) {
+      //   store.dispatch(setBike(values[i]));
+      // }
+      store.dispatch(setBikes(values));
     });
   }
 }

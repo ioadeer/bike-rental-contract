@@ -6,6 +6,13 @@ const setBike = (bike) => {
   }
 }
 
+const setBikes = (bikes) => {
+  return {
+    type:'SET_BIKES',
+    payload: bikes
+  }
+}
+
 const clearBikes = () => {
   return {
     type:'CLEAR_BIKES',
@@ -15,4 +22,5 @@ const clearBikes = () => {
 export {
   setBike,
   clearBikes,
+  setBikes,
 };

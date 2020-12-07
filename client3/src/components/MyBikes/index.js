@@ -34,6 +34,7 @@ function MyBikes() {
   const userAddress = useSelector((state) => state.UserReducer.address);
   const bikes = useSelector((state) => state.BikeReducer);
   const filteredBikes = bikes.filter((bike) => bike.owner === userAddress);
+  // console.log(filteredBikes);
   const rentBike = useSelector((state) => state.ContractReducer.methods.rentBike);
   const contractInstance = useSelector((state) => state.ContractReducer);
 
