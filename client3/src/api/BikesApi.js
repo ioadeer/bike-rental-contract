@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import store from '../store';
 
 import {

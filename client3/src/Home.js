@@ -30,6 +30,7 @@ import NavBar from './components/NavBar';
 import CreateBikeForm from './components/CreateBikeForm';
 import RentBike from './components/RentBike';
 import MyBikes from './components/MyBikes';
+import MyRentals from './components/MyRentals';
 
 function Home() {
   const dispatch = useDispatch();
@@ -124,6 +125,9 @@ function Home() {
               </Route>
               <Route path="/my-bikes">
                 <MyBikes />
+              </Route>
+              <Route path="/my-rentals">
+                <MyRentals />
               </Route>
             </Switch>
           </Router>

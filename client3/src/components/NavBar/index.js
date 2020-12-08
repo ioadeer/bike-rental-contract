@@ -57,6 +57,11 @@ function NavBar() {
             </Link>
           </li>
           <li>
+            <Link to="/my-rentals">
+              My rentals
+            </Link>
+          </li>
+          <li>
             Hola!&nbsp;
             { address }
           </li>

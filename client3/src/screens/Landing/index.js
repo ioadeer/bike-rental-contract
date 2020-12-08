@@ -49,7 +49,7 @@ function Landing() {
         <button
           type="button"
           className="btn btn-flat black-text main-menu-button"
-          onClick={() => history.push('/my-bikes')}
+          onClick={() => history.push('/my-rentals')}
         >
           MY BIKES
         </button>
