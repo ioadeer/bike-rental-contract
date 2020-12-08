@@ -1,4 +1,4 @@
-//pragma solidity >= 0.4.24 <= 0.7.0;
+pragma solidity >= 0.4.24 <= 0.7.0;
 pragma solidity ^0.6.0;
 
 // import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -97,16 +97,17 @@ contract BikeRent is AccessControl {
    // require a collateral
    require(_collateral> 0, "Bike must have a collateral");
    // increase bike count 
+   // array starts at 1 as 0 is considered default value
+   bikeCount ++;
    bikes[bikeCount] = Bike(bikeCount, _description, msg.sender, _available, _rentPrice, _collateral);
    emit BikeCreation(bikeCount,_description, msg.sender, _available, _rentPrice, _collateral);
-   bikeCount ++;
  }
 
  function rentBike(uint _id) public payable {
    // fetch bike
    Bike memory _bike = bikes[_id];
    // make sure that bike exist checkin bike id
-   require(_bike.id >= 0 && _bike.id < bikeCount, "Bike id not valid");
+   require(_bike.id > 0 && _bike.id <= bikeCount, "Bike id not valid");
    // check if bike is available for rent 
    require(_bike.available, "Oops, bike is not available");
    // check if transaction can cover collateral and rent price
@@ -123,6 +124,8 @@ contract BikeRent is AccessControl {
    _renter.transfer(rentPrice);
    _bike.available = false;
    bikes[_id] = _bike;
+   // array starts at 1 as 0 is considered default value
+   bikeRentalsCount++;
    bikeRentals[bikeRentalsCount] = BikeRental(
                                               bikeRentalsCount,
                                               _renter,
@@ -133,7 +136,6 @@ contract BikeRent is AccessControl {
                                               false,
                                               false
                                               ); 
-   bikeRentalsCount++;
    emit BikeRented(_renter, msg.sender, _bike.id, _bike.rentPrice, _bike.collateral);
  }
 
@@ -196,6 +198,35 @@ contract BikeRent is AccessControl {
    // transfer claimed collateral
    _rentee.transfer(returnedCollateral); 
    emit CollateralReturned(returnedCollateral, _rentee);
+ }
+
+ function getAccountsRegisteredBikes(address _account) public view returns (uint [50] memory) {
+   Bike memory _bike;
+   uint [50] memory _matchingBikes;
+   uint _matchingNumberCount = 0;
+   for(uint i = 1; i <= bikeCount && _matchingNumberCount < _matchingBikes.length; i++) {
+     _bike = bikes[i];
+     if(_bike.owner == _account) {
+       _matchingBikes[_matchingNumberCount] = i;
+       _matchingNumberCount++;
+     }
+   }
+   return _matchingBikes;
+ }
+
+ function getAccountsRentals(address _account) public view returns (uint [50] memory) {
+   BikeRental memory _bikeRental;
+   uint[50] memory _matchingRentals;
+   uint _matchingNumberCount = 0;
+   for(uint i = bikeRentalsCount; i > 0 && _matchingNumberCount < _matchingRentals.length; i--) {
+     _bikeRental = bikeRentals[i];
+     if(_bikeRental.renter == payable(_account) || 
+        _bikeRental.rentee == payable(_account)) {
+       _matchingRentals[_matchingNumberCount] = i;
+       _matchingNumberCount++;
+     }
+   }
+   return _matchingRentals;
  }
 
  modifier onlyAdmin(){

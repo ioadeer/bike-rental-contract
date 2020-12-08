@@ -24,6 +24,7 @@ import {
 
 import {
   fetchBikes,
+  fetchUserBikes,
 } from '../../api/BikesApi';
 
 import TransactionStatusDisplay from '../TransactionStatusDisplay';
@@ -34,13 +35,16 @@ function MyBikes() {
   const userAddress = useSelector((state) => state.UserReducer.address);
   const bikes = useSelector((state) => state.BikeReducer);
   const filteredBikes = bikes.filter((bike) => bike.owner === userAddress);
+  const noBikes = (filteredBikes.length === 0);
+  console.log(noBikes);
   // console.log(filteredBikes);
   const rentBike = useSelector((state) => state.ContractReducer.methods.rentBike);
   const contractInstance = useSelector((state) => state.ContractReducer);
 
   useEffect(() => {
     if (!init) {
-      fetchBikes(contractInstance);
+      // fetchBikes(contractInstance);
+      fetchUserBikes(contractInstance, userAddress);
       setInit(true);
     }
     return function cleanup() {
@@ -75,7 +79,7 @@ function MyBikes() {
       <div className="row">
         <div className="col s10 offset-s1">
           <h1>My bikes</h1>
-          {filteredBikes && (
+          {!noBikes && (
             <table className="bordered centered highlight responsive-table">
               <thead>
                 <tr>
@@ -118,7 +122,7 @@ function MyBikes() {
               </tbody>
             </table>
           )}
-          {!filteredBikes && (
+          {noBikes && (
             <p>No bikes registered by this address!</p>
           )}
         </div>

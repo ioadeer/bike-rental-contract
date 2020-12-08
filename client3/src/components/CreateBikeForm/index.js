@@ -75,8 +75,6 @@ function CreateBikeForm() {
             setCollateral('');
             setBikeRentPrice('');
           }
-          console.log('Malformed receipt ');
-          console.log(receipt);
         })
         .catch((error) => {
           dispatch(setReject(error));
