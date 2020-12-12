@@ -82,6 +82,7 @@ function RentBike() {
                   <th>Price</th>
                   <th>Collateral</th>
                   <th>Owner</th>
+                  <th>Available</th>
                 </tr>
               </thead>
               <tbody>
@@ -99,6 +100,20 @@ function RentBike() {
                       <i>wei</i>
                     </td>
                     <td>{bike.owner}</td>
+                    {bike.available && (
+                      <td>
+                        <i className="material-icons">
+                          done
+                        </i>
+                      </td>
+                    )}
+                    {!bike.available && (
+                      <td>
+                        <i className="material-icons">
+                          do_not_disturb_on
+                        </i>
+                      </td>
+                    )}
                     {bike.available && (
                       <button
                         type="button"

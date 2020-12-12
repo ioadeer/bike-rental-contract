@@ -31,3 +31,8 @@ html, body {margin: 0; height: 100%; overflow: hidden}
   color: #000000;
   background-color: #f5f5f5; 
 }
+.rented-bikes-buttons-menu {
+  margin-top: 2em;
+  display: flex;
+  justify-content: center;
+}

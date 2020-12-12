@@ -38,7 +38,7 @@ function Landing() {
         <button
           type="button"
           className="btn btn-flat black-text main-menu-button"
-          onClick={() => history.push('/create-bike')}
+          onClick={() => history.push('/my-rentals')}
         >
           MY RENTALS
         </button>
@@ -49,7 +49,7 @@ function Landing() {
         <button
           type="button"
           className="btn btn-flat black-text main-menu-button"
-          onClick={() => history.push('/my-rentals')}
+          onClick={() => history.push('/my-bikes')}
         >
           MY BIKES
         </button>
