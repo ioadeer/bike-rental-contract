@@ -99,7 +99,11 @@ function RentBike() {
                       &nbsp;
                       <i>wei</i>
                     </td>
-                    <td>{bike.owner}</td>
+                    <td>
+                      {bike.owner.slice(0, 4)}
+                      ...
+                      {bike.owner.slice(-4)}
+                    </td>
                     {bike.available && (
                       <td>
                         <i className="material-icons">

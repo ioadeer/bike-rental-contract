@@ -36,3 +36,19 @@ html, body {margin: 0; height: 100%; overflow: hidden}
   display: flex;
   justify-content: center;
 }
+
+.detail-title {
+  margin-top: 0.5em;
+  margin-bottom: 0.125em;
+  text-align: left;
+}
+
+.detail-item-label {
+  text-align: right;
+  margin-top: 5px;
+}
+
+.detail-item {
+  font-size: 1.75em;
+}
+

@@ -1,9 +1,15 @@
 import React from 'react';
 
+import {
+  useHistory,
+} from 'react-router-dom';
+
 function BikesRentedList({
   hasRentalsAsRentee,
   rentalsAsRentee,
 }) {
+  const history = useHistory();
+
   return (
     <div>
       <h1>Bikes you rented</h1>
@@ -22,9 +28,16 @@ function BikesRentedList({
           </thead>
           <tbody>
             {rentalsAsRentee.map((rental) => (
-              <tr key={rental.rental_id}>
+              <tr
+                key={rental.rental_id}
+                onClick={() => history.push(`/rental/${rental.rental_id}`)}
+              >
                 <td>{rental.rental_id}</td>
-                <td>{rental.renter}</td>
+                <td>
+                  {rental.renter.slice(0, 4)}
+                  ...
+                  {rental.renter.slice(-4)}
+                </td>
                 <td>{rental.bike_id}</td>
                 <td>
                   {rental.rent_price}
