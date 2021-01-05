@@ -3,8 +3,6 @@ import React, {
   useEffect,
 } from 'react';
 
-import Web3 from 'web3';
-
 import {
   useSelector,
   useDispatch,
@@ -13,14 +11,6 @@ import {
 import {
   clearBikes,
 } from '../../actions/BikeActions';
-
-import {
-  setSending,
-  setSuccess,
-  setError,
-  setReset,
-  setReject,
-} from '../../actions/TransactionActions';
 
 import {
   fetchUserRentals,

@@ -78,7 +78,13 @@ function BikeLentDetail({
             <b>to</b>
           </span>
         </div>
-        <div className="col s6 detail-item" onClick={handleSeeFullAddress}>
+        <div
+          role="button"
+          tabIndex={0}
+          className="col s6 detail-item"
+          onClick={handleSeeFullAddress}
+          onKeyDown={handleSeeFullAddress}
+        >
           {!seeFullAddress && (
             <span>
               {rental.rentee.slice(0, 4)}
@@ -177,6 +183,7 @@ function BikeLentDetail({
         {!rental.renter_returned_approval && (
           <div className="col s12" style={{ paddingTop: '2em', display: 'flex', justifyContent: 'center' }}>
             <button
+              type="button"
               className="btn waves-effect waves-light"
               onClick={() => handleRenterReturnApproval(`${rental.rental_id}`)}
             >

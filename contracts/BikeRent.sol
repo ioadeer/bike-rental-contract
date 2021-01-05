@@ -156,6 +156,19 @@ contract BikeRent is AccessControl {
                       _bikeRental.rentee,
                       _bikeRental.bike_id
                       );
+     // fetch rentee 
+     address payable _rentee = _bikeRental.rentee;
+     // calculate collateral for insurance use
+     uint256 insuranceCollateral = _bikeRental.collateral.mul(insurancePercentage).div(100);
+     // calculate collateral to be returned
+     uint256 returnedCollateral = _bikeRental.collateral.sub(insuranceCollateral);
+     // get address total collateral
+     uint256 addressTotalCollateral = lockedCollateral[_rentee];
+     // set address new total collateral
+     lockedCollateral[address(msg.sender)] = addressTotalCollateral.sub(returnedCollateral);
+     // transfer claimed collateral
+     _rentee.transfer(returnedCollateral); 
+     emit CollateralReturned(returnedCollateral, _rentee);
    }
    return true;
  }
@@ -176,6 +189,19 @@ contract BikeRent is AccessControl {
                       _bikeRental.rentee,
                       _bikeRental.bike_id
                       );
+     // fetch rentee 
+     address payable _rentee = _bikeRental.rentee;
+     // calculate collateral for insurance use
+     uint256 insuranceCollateral = _bikeRental.collateral.mul(insurancePercentage).div(100);
+     // calculate collateral to be returned
+     uint256 returnedCollateral = _bikeRental.collateral.sub(insuranceCollateral);
+     // get address total collateral
+     uint256 addressTotalCollateral = lockedCollateral[address(msg.sender)];
+     // set address new total collateral
+     lockedCollateral[address(msg.sender)] = addressTotalCollateral.sub(returnedCollateral);
+     // transfer claimed collateral
+     _rentee.transfer(returnedCollateral); 
+     emit CollateralReturned(returnedCollateral, _rentee);
    }
    return true;
  }

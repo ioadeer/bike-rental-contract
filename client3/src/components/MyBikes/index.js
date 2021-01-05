@@ -3,8 +3,6 @@ import React, {
   useEffect,
 } from 'react';
 
-import Web3 from 'web3';
-
 import {
   useSelector,
   useDispatch,
@@ -15,15 +13,7 @@ import {
 } from '../../actions/BikeActions';
 
 import {
-  setSending,
-  setSuccess,
-  setError,
-  setReset,
-  setReject,
-} from '../../actions/TransactionActions';
-
-import {
-  fetchBikes,
+  // fetchBikes,
   fetchUserBikes,
 } from '../../api/BikesApi';
 
@@ -37,8 +27,6 @@ function MyBikes() {
   const filteredBikes = bikes.filter((bike) => bike.owner === userAddress);
   const noBikes = (filteredBikes.length === 0);
   console.log(noBikes);
-  // console.log(filteredBikes);
-  const rentBike = useSelector((state) => state.ContractReducer.methods.rentBike);
   const contractInstance = useSelector((state) => state.ContractReducer);
 
   useEffect(() => {
@@ -52,28 +40,6 @@ function MyBikes() {
     };
   }, [init]);
 
-  async function bikeRentHandle(id, rentPrice, collateral) {
-    const finalValue = Web3.utils.toBN(rentPrice).add(Web3.utils.toBN(collateral)).toString();
-    console.log(finalValue);
-    rentBike(id).send({ from: userAddress, value: finalValue })
-      .once('sending', () => {
-        dispatch(setSending());
-      })
-      .on('error', (error) => {
-        console.log(error);
-        dispatch(setError(error));
-      })
-      .on('receipt', (receipt) => {
-        dispatch(setSuccess(receipt));
-      })
-      .then((rec) => {
-        console.log(rec);
-        dispatch(setReset());
-      })
-      .catch((error) => {
-        dispatch(setReject(error));
-      });
-  }
   return (
     <div className="container">
       <div className="row">

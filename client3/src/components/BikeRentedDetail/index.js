@@ -2,14 +2,56 @@ import React, {
   useState,
 } from 'react';
 
+import {
+  useSelector,
+  useDispatch,
+} from 'react-redux';
+
+import {
+  setSending,
+  setSuccess,
+  setError,
+  setReset,
+  setReject,
+} from '../../actions/TransactionActions';
+
+import {
+  setRenteeReturnApproval,
+} from '../../actions/RentalActions';
+
+import TransactionStatusDisplay from '../TransactionStatusDisplay';
+
 function BikeRentedDetail({
   rental,
 }) {
+  const dispatch = useDispatch();
   const [seeFullAddress, setSeeFullAddress] = useState(false);
+  const renteeReturnApprove = useSelector((state) => state.ContractReducer.methods.renteeReturnApprove);
+  const user = useSelector((state) => state.UserReducer.address);
 
   const handleSeeFullAddress = () => {
     setSeeFullAddress(!seeFullAddress);
   };
+
+  async function handleRenteeReturnApproval(id) {
+    dispatch(setReset());
+    renteeReturnApprove(id).send({ from: user })
+      .once('sending', () => {
+        dispatch(setSending());
+      })
+      .on('error', (error) => {
+        dispatch(setError(error));
+      })
+      .then((receipt) => {
+        if (receipt.transactionHash) {
+          dispatch(setSuccess(receipt));
+          dispatch(setRenteeReturnApproval(id));
+        }
+      })
+      .catch((error) => {
+        dispatch(setReject(error));
+      });
+  }
 
   return (
     <div className="row">
@@ -36,7 +78,13 @@ function BikeRentedDetail({
             <b>from</b>
           </span>
         </div>
-        <div className="col s6 detail-item" onClick={handleSeeFullAddress}>
+        <div
+          role="button"
+          tabIndex={0}
+          className="col s6 detail-item"
+          onClick={handleSeeFullAddress}
+          onKeyDown={handleSeeFullAddress}
+        >
           {!seeFullAddress && (
             <span>
               {rental.renter.slice(0, 4)}
@@ -132,7 +180,19 @@ function BikeRentedDetail({
             </span>
           )}
         </div>
+        {!rental.rentee_returned_approval && (
+          <div className="col s12" style={{ paddingTop: '2em', display: 'flex', justifyContent: 'center' }}>
+            <button
+              type="button"
+              className="btn waves-effect waves-light"
+              onClick={() => handleRenteeReturnApproval(`${rental.rental_id}`)}
+            >
+              Notify bike return
+            </button>
+          </div>
+        )}
       </div>
+      <TransactionStatusDisplay />
     </div>
   );
 }
