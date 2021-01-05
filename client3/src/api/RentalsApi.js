@@ -28,7 +28,9 @@ export async function fetchUserRentals(bikeRentalInstance, userAddress) {
                                    .methods
                                    .getAccountsRentals(userAddress)
                                    .call();
+    console.log(userRentalsIndexes);
     const foundRentalsIndexes = userRentalsIndexes.filter((rental) => rental.toString() !== '0');
+    console.log(foundRentalsIndexes);
     const promises = [];
     for (let i = 0; i < foundRentalsIndexes.length; i += 1) {
       promises.push(bikeRentalInstance.methods.bikeRentals(foundRentalsIndexes[i]).call());

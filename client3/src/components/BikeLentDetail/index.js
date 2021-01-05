@@ -19,6 +19,8 @@ import {
   setRenterReturnApproval,
 } from '../../actions/RentalActions';
 
+import TransactionStatusDisplay from '../TransactionStatusDisplay';
+
 function BikeLentDetail({
   rental,
 }) {
@@ -183,6 +185,7 @@ function BikeLentDetail({
           </div>
         )}
       </div>
+      <TransactionStatusDisplay />
     </div>
   );
 }

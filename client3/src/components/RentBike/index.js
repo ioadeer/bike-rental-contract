@@ -49,7 +49,8 @@ function RentBike() {
 
   async function bikeRentHandle(id, rentPrice, collateral) {
     const finalValue = Web3.utils.toBN(rentPrice).add(Web3.utils.toBN(collateral)).toString();
-    console.log(finalValue);
+    // console.log(finalValue);
+    dispatch(setReset());
     rentBike(id).send({ from: userAddress, value: finalValue })
       .once('sending', () => {
         dispatch(setSending());
@@ -61,10 +62,10 @@ function RentBike() {
       .on('receipt', (receipt) => {
         dispatch(setSuccess(receipt));
       })
-      .then((rec) => {
-        console.log(rec);
-        dispatch(setReset());
-      })
+      // .then((rec) => {
+      //   console.log(rec);
+      //   dispatch(setReset());
+      // })
       .catch((error) => {
         dispatch(setReject(error));
       });

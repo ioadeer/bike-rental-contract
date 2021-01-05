@@ -23,7 +23,7 @@ import {
 } from '../../actions/TransactionActions';
 
 import {
-  fetchRentals,
+  fetchUserRentals,
 } from '../../api/RentalsApi';
 
 import BikesLentList from '../BikesLentList';
@@ -47,7 +47,7 @@ function MyRentals() {
   useEffect(() => {
     if (!init) {
       dispatch(clearBikes());
-      fetchRentals(contractInstance, userAddress);
+      fetchUserRentals(contractInstance, userAddress);
       setInit(true);
     }
     return function cleanup() {
