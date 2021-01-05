@@ -46,11 +46,12 @@ function MyRentals() {
 
   useEffect(() => {
     if (!init) {
+      dispatch(clearBikes());
       fetchRentals(contractInstance, userAddress);
       setInit(true);
     }
     return function cleanup() {
-      dispatch(clearBikes());
+      // dispatch(clearBikes());
     };
   }, [init]);
 

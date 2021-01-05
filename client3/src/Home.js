@@ -25,6 +25,10 @@ import {
   setContract,
 } from './actions/ContractActions';
 
+// import {
+//   fetchRentals,
+// } from './api/RentalsApi';
+
 import Landing from './screens/Landing';
 import NavBar from './components/NavBar';
 import CreateBikeForm from './components/CreateBikeForm';
@@ -68,6 +72,7 @@ function Home() {
       const tempAdminRole = await bikeRentalInstance.methods.DEFAULT_ADMIN_ROLE().call();
       const hasAdminRole = await bikeRentalInstance.methods.hasRole(tempAdminRole, accounts[0]).call();
       dispatch(setIsAdmin(hasAdminRole));
+      // fetchRentals(bikeRentalInstance, accounts[0]);
       setEthereumEneabled(true);
       setLoading(false);
     } else {

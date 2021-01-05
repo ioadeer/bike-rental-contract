@@ -1,4 +1,6 @@
 /* eslint-disable */
+const initialState = [];
+
 const RentalReducer = (initialState = [], action) => {
   switch(action.type) {
     case 'SET_RENTALS':
@@ -17,6 +19,24 @@ const RentalReducer = (initialState = [], action) => {
                   });
       }
       return rentals;
+    case 'SET_RENTER_RETURN_APPROVAL':
+      return initialState.map((rental) => {
+        rental.rental_id === payload ? 
+          {
+            ...rental, 
+            renter_returned_approval: true
+          } 
+          : rental 
+        });
+    case 'SET_RENTEE_RETURN_APPROVAL':
+      return initialState.map((rental) => {
+        rental.rental_id === payload ? 
+          {
+            ...rental, 
+            rentee_returned_approval: true
+          } 
+          : rental 
+        });
     case 'CLEAR_RENTALS':
       return [];
     default:

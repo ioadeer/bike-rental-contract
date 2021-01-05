@@ -2,14 +2,54 @@ import React, {
   useState,
 } from 'react';
 
+import {
+  useSelector,
+  useDispatch,
+} from 'react-redux';
+
+import {
+  setSending,
+  setSuccess,
+  setError,
+  setReset,
+  setReject,
+} from '../../actions/TransactionActions';
+
+import {
+  setRenterReturnApproval,
+} from '../../actions/RentalActions';
+
 function BikeLentDetail({
   rental,
 }) {
+  const dispatch = useDispatch();
   const [seeFullAddress, setSeeFullAddress] = useState(false);
+  const renterReturnApprove = useSelector((state) => state.ContractReducer.methods.renterReturnApprove);
+  const user = useSelector((state) => state.UserReducer.address);
 
   const handleSeeFullAddress = () => {
     setSeeFullAddress(!seeFullAddress);
   };
+
+  async function handleRenterReturnApproval(id) {
+    dispatch(setReset());
+    renterReturnApprove(id).send({ from: user })
+      .once('sending', () => {
+        dispatch(setSending());
+      })
+      .on('error', (error) => {
+        dispatch(setError(error));
+      })
+      .then((receipt) => {
+        if (receipt.transactionHash) {
+          dispatch(setSuccess(receipt));
+          dispatch(setRenterReturnApproval(id));
+        }
+      })
+      .catch((error) => {
+        dispatch(setReject(error));
+      });
+  }
 
   return (
     <div className="row">
@@ -132,6 +172,16 @@ function BikeLentDetail({
             </span>
           )}
         </div>
+        {!rental.renter_returned_approval && (
+          <div className="col s12" style={{ paddingTop: '2em', display: 'flex', justifyContent: 'center' }}>
+            <button
+              className="btn waves-effect waves-light"
+              onClick={() => handleRenterReturnApproval(`${rental.rental_id}`)}
+            >
+              Notify bike return
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

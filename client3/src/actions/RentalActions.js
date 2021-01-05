@@ -7,6 +7,20 @@ const setRentals = (rentals) => {
   }
 }
 
+const setRenterReturnApproval = (id) => {
+  return {
+    type:'SET_RENTER_RETURN_APPROVAL',
+    payload: id
+  }
+}
+
+const setRenteeReturnApproval = (id) => {
+  return {
+    type:'SET_RENTEE_RETURN_APPROVAL',
+    payload: id
+  }
+}
+
 const clearRentals= () => {
   return {
     type:'CLEAR_RENTALS',
@@ -16,4 +30,6 @@ const clearRentals= () => {
 export {
   setRentals,
   clearRentals,
+  setRenterReturnApproval,
+  setRenteeReturnApproval,
 };
