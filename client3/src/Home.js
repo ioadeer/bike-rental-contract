@@ -36,6 +36,7 @@ import RentBike from './components/RentBike';
 import MyBikes from './components/MyBikes';
 import MyRentals from './components/MyRentals';
 import RentalDetail from './components/RentalDetail';
+import BikeDetail from './components/BikeDetail';
 
 function Home() {
   const dispatch = useDispatch();
@@ -137,6 +138,9 @@ function Home() {
               </Route>
               <Route path="/rental/:rentalId">
                 <RentalDetail />
+              </Route>
+              <Route path="/bike/:bikeId">
+                <BikeDetail />
               </Route>
             </Switch>
           </Router>

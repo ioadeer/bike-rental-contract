@@ -6,6 +6,10 @@ import React, {
 import Web3 from 'web3';
 
 import {
+  useHistory,
+} from 'react-router-dom';
+
+import {
   useSelector,
   useDispatch,
 } from 'react-redux';
@@ -30,6 +34,7 @@ import TransactionStatusDisplay from '../TransactionStatusDisplay';
 
 function RentBike() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [init, setInit] = useState(false);
   const userAddress = useSelector((state) => state.UserReducer.address);
   const bikes = useSelector((state) => state.BikeReducer);
@@ -39,11 +44,11 @@ function RentBike() {
 
   useEffect(() => {
     if (!init) {
+      dispatch(clearBikes());
       fetchBikes(contractInstance);
       setInit(true);
     }
     return function cleanup() {
-      dispatch(clearBikes());
     };
   }, [init]);
 
@@ -62,10 +67,6 @@ function RentBike() {
       .on('receipt', (receipt) => {
         dispatch(setSuccess(receipt));
       })
-      // .then((rec) => {
-      //   console.log(rec);
-      //   dispatch(setReset());
-      // })
       .catch((error) => {
         dispatch(setReject(error));
       });
@@ -88,7 +89,10 @@ function RentBike() {
               </thead>
               <tbody>
                 {filteredBikes.map((bike) => (
-                  <tr key={bike.bike_id}>
+                  <tr
+                    key={bike.bike_id}
+                    onClick={() => history.push(`/bike/${bike.bike_id}`)}
+                  >
                     <td>{bike.description}</td>
                     <td>
                       {bike.rent_price}

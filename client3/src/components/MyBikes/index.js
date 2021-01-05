@@ -26,7 +26,6 @@ function MyBikes() {
   const bikes = useSelector((state) => state.BikeReducer);
   const filteredBikes = bikes.filter((bike) => bike.owner === userAddress);
   const noBikes = (filteredBikes.length === 0);
-  console.log(noBikes);
   const contractInstance = useSelector((state) => state.ContractReducer);
 
   useEffect(() => {

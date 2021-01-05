@@ -32,7 +32,6 @@ export async function fetchUserBikes(bikeRentalInstance, userAddress) {
                                    .call();
     const foundBikesIndexes = userBikesIndexes.filter((bike) => bike.toString() !== '0');
     const promises = [];
-    console.log(foundBikesIndexes);
     for (let i = 0; i < foundBikesIndexes.length; i += 1) {
       promises.push(bikeRentalInstance.methods.bikes(foundBikesIndexes[i]).call());
     }
