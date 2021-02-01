@@ -94,7 +94,7 @@ function BikeRentedDetail({
           )}
           {seeFullAddress && (
             <span>
-              {rental.rentee}
+              {rental.renter}
             </span>
           )}
         </div>
