@@ -39,7 +39,7 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
       // Success
       assert.equal(registeredBikesCount, 1);
       const event = result.logs[0].args;
-      assert.equal(event.id.toNumber(), 0, 'First created bike id is zero');
+      assert.equal(event.id.toNumber(), 1, 'First created bike id is one');
       assert.equal(event.description, 'Mountain bike', 'Description is correct');
       assert.isBoolean(event.available, 'Bike availability should be boolean');
       assert.equal(event.rentPrice, web3.utils.toWei('1', 'Ether'),'Bike rent price is correct');
@@ -73,8 +73,8 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
 
     it('lists bikes on public uint bikes mapping', async () => {
       // fetch first created bike
-      const bike = await bikeRentInstance.bikes(0);
-      assert.equal(bike.id.toNumber(), 0, 'Bike id for first created bike should be zero');
+      const bike = await bikeRentInstance.bikes(1);
+      assert.equal(bike.id.toNumber(), 1, 'Bike id for first created bike should be one');
       assert.equal(bike.description, 'Mountain bike', 'Bike description is correct');
       assert.equal(bike.owner, renter, 'Bike owner is renter');
       assert.equal(bike.rentPrice, web3.utils.toWei('1', 'Ether'),'Bike rent price is correct');
@@ -86,16 +86,16 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
     it('rents bike, emmits event, locks collateral and creates bike rent struct mapping', async () => {
       // FAILURE 
       // transaction should cover rent price and collateral  
-      await bikeRentInstance.rentBike(0, 
+      await bikeRentInstance.rentBike(1, 
                                      { from: rentee, value: web3.utils.toWei('1', 'Ether')}
                                      ).should.be.rejected;
 
       // transaction should not exceed rent price and collateral  
-      await bikeRentInstance.rentBike(0, 
+      await bikeRentInstance.rentBike(1, 
                                      { from: rentee, value: web3.utils.toWei('3', 'Ether')}
                                      ).should.be.rejected;
       // renter should not be allowed to rent his own bike 
-      await bikeRentInstance.rentBike(0, 
+      await bikeRentInstance.rentBike(1, 
                                      { from: renter, value: web3.utils.toWei('2', 'Ether')}
                                      ).should.be.rejected;
       // bike to be rented should exist 
@@ -109,13 +109,13 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
       initialRenterBalance = new web3.utils.BN(initialRenterBalance);
       
       // SUCCESS
-      result = await bikeRentInstance.rentBike(0, { from: rentee, value: web3.utils.toWei('2', 'Ether')});
+      result = await bikeRentInstance.rentBike(1, { from: rentee, value: web3.utils.toWei('2', 'Ether')});
 
       // Bike rented event
       const event = result.logs[0].args;
       assert.equal(event.renter, renter, 'Renter address should be logged in event');
       assert.equal(event.rentee, rentee, 'Rentee address should be logged in event');
-      assert.equal(event.bike_id, 0, 'Rike rented event should log bike id');
+      assert.equal(event.bike_id, 1, 'Rike rented event should log bike id');
       assert.equal(event.rentPrice,
                    web3.utils.toWei('1','Ether'), 
                    'Rental price is correct'
@@ -138,11 +138,11 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
       assert.equal(finalRenterBalance.toString(), expectedBalance.toString());
 
       // retrieve bike rental from mapping
-      const bikeRental = await bikeRentInstance.bikeRentals(0);
-      assert.equal(bikeRental.id.toNumber(), 0, 'Id for first created bike rental should be zero');
+      const bikeRental = await bikeRentInstance.bikeRentals(1);
+      assert.equal(bikeRental.id.toNumber(), 1, 'Id for first created bike rental should be one');
       assert.equal(bikeRental.renter, renter, 'Bike rental renter should be bike renter'); 
       assert.equal(bikeRental.rentee, rentee, 'Bike rental rentee should be bike rentee'); 
-      assert.equal(bikeRental.bike_id, 0, 'Rented bike_id should be first created bike');
+      assert.equal(bikeRental.bike_id, 1, 'Rented bike_id should be first created bike');
       assert.equal(
                   bikeRental.rentPrice, 
                   web3.utils.toWei('1', 'Ether'), 
@@ -167,13 +167,53 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
                   );
       // Failure after rental before return
       // bike should not be available after rental
-      await bikeRentInstance.rentBike(0, 
+      await await bikeRentInstance.rentBike(1, 
                                      { from: rentee, value: web3.utils.toWei('2', 'Ether')}
                                      ).should.be.rejected;
     });
   });
 
-  it('returns bikes', async () => {
+  describe('bike returned', () => {
+    it('returns bikes with renter approval and then rentee approval', async () => {
+      // FIRST: renter return approval
+      // FAILURE 
+      // Renter return approve should be sent by renter
+      await await bikeRentInstance.renterReturnApprove(1, 
+                                     { from: rentee }
+                                     ).should.be.rejected;
+
+      // SUCCESS
+      await bikeRentInstance.renterReturnApprove(1, 
+                                  { from: renter }
+                                  );
+
+      let bikeRental  = await bikeRentInstance.bikeRentals(1);
+      assert.isTrue(bikeRental.renterReturnApproval, 'Renter return approval should be true');
+
+      // should be rejected once renter approval is true
+      await await bikeRentInstance.renterReturnApprove(1, 
+                                  { from: renter }
+                                  ).should.be.rejected;
+
+      // only rentee can aprove renteeReturnApprove
+      await await bikeRentInstance.renteeReturnApprove(1, 
+                                                  { from: renter}
+                                                  ).should.be.rejected;
+      // SUCCESS: rentee return emmits event
+      let result = await bikeRentInstance.renteeReturnApprove(1, 
+                                                  { from: rentee }
+                                                  );
+      // should be rejected once rentee approval is true
+      await await bikeRentInstance.renteeReturnApprove(1, 
+                                                  { from: rentee }
+                                                  ).should.be.rejected;
+      // Should emmit event
+      const event = result.logs[0].args;
+      assert.equal(event.renter, renter, 'Renter address should be logged in event');
+      assert.equal(event.rentee, rentee, 'Rentee address should be logged in event');
+      assert.equal(event.bike_id, 1, 'Rike rented event should log bike id');
+    });
 
   });
 });
+
