@@ -174,7 +174,7 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
   });
 
   describe('bike returned', () => {
-    it('returns bikes with renter approval and then rentee approval', async () => {
+    it('returns bike with renter approval and then rentee approval', async () => {
       // FIRST: renter return approval
       // FAILURE 
       // Renter return approve should be sent by renter
@@ -199,6 +199,12 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
       await await bikeRentInstance.renteeReturnApprove(1, 
                                                   { from: renter}
                                                   ).should.be.rejected;
+
+      let renteeIntialCollateral = await bikeRentInstance.lockedCollateral(rentee); 
+      renteeIntialCollateral = new web3.utils.BN(renteeIntialCollateral);
+
+      const balanceNoCollateralReturned = await web3.eth.getBalance(rentee);
+
       // SUCCESS: rentee return emmits event
       let result = await bikeRentInstance.renteeReturnApprove(1, 
                                                   { from: rentee }
@@ -208,12 +214,37 @@ contract('BikeRent', ([deployer, renter, rentee]) => {
                                                   { from: rentee }
                                                   ).should.be.rejected;
       // Should emmit event
-      const event = result.logs[0].args;
-      assert.equal(event.renter, renter, 'Renter address should be logged in event');
-      assert.equal(event.rentee, rentee, 'Rentee address should be logged in event');
-      assert.equal(event.bike_id, 1, 'Rike rented event should log bike id');
-    });
+      const bikeReturnedEvent = result.logs[0].args;
+      assert.equal(bikeReturnedEvent.renter, renter, 'Renter address should be logged in event');
+      assert.equal(bikeReturnedEvent.rentee, rentee, 'Rentee address should be logged in event');
+      assert.equal(bikeReturnedEvent.bike_id, 1, 'Bike rented event should log bike id');
 
+      const collateralReturnedEvent = result.logs[1].args;
+      assert.equal(collateralReturnedEvent.rentee, rentee, 'Rentee should receive collateral');
+
+      renteeFinalCollateral = await bikeRentInstance.lockedCollateral(rentee); 
+      renteeFinalCollateral = new web3.utils.BN(renteeFinalCollateral);
+
+      // 10 percent insurance
+      const insurance = +renteeIntialCollateral * 10 / 100;
+      const returnedCollateral = +renteeIntialCollateral - insurance;
+      const collateralReturnedAsStatedInEvent = +collateralReturnedEvent.collateral;
+
+      assert.equal(
+                  collateralReturnedAsStatedInEvent, 
+                  returnedCollateral,
+                  'Collateral returned should equal to initial col minus insurance'
+                  );
+
+      const balanceWithCollateralReturned = await web3.eth.getBalance(rentee);
+
+      const previousBalancePlusCollateral= +balanceNoCollateralReturned + returnedCollateral;
+
+      assert.isTrue(
+                   +balanceWithCollateralReturned > balanceNoCollateralReturned, 
+                   'Final balance should be greater than previous balance'
+                   );
+    });
   });
 });
 
