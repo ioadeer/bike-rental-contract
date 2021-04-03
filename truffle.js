@@ -14,23 +14,6 @@ module.exports = {
 			version: "0.6.2",
 		},
 	},
-  networks: {
-    development: {
-      host: "127.0.0.1",
-      // ganache
-      // port: 7545,
-      // truffle-develop 
-      port: 7545,
-      network_id: "*" // Match any network id
-    }
-    rinkeby: {
-      // project test-1
-     provider: () => new HDWalletProvider(mnemonic, `https://rinkeby.infura.io/v3/3515c91786994b689bf3c06943f0b22c`),
-     network_id: 4,       // Ropsten's id
-     gas: 4500000,        // Ropsten has a lower block limit than mainnet
-     gasPrice: 10000000000,
-     },
-  },
   contracts_build_directory: path.join(__dirname, "client3/src/contracts"),
   //networks: {
   //  development: {
@@ -39,4 +22,22 @@ module.exports = {
   //    network_id: "*" // Match any network id
   //  }
   //}
+  networks: {
+    development: {
+      host: "127.0.0.1",
+      // ganache
+      // port: 7545,
+      // truffle-develop 
+      port: 9545,
+      network_id: "*" // Match any network id
+    },
+    rinkeby: {
+      // project test-1
+     provider: () => new HDWalletProvider(mnemonic, `https://rinkeby.infura.io/v3/3515c91786994b689bf3c06943f0b22c`),
+     network_id: 4,       // Ropsten's id
+     gas: 4500000,        // Ropsten has a lower block limit than mainnet
+     gasPrice: 40000000000, //10000000000,
+     from: "0xd6Ce618f43efc162C57bEDC96541dF8208C6FdD2"
+     },
+  },
 };
