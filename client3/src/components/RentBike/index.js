@@ -124,16 +124,14 @@ function RentBike() {
                       </td>
                     )}
                     {bike.available && (
-                      <button
-                        type="button"
-                        onClick={() => bikeRentHandle(bike.bike_id, bike.rent_price, bike.collateral)}
+                      <td
                         className="btn btn-large btn-flat waves-effect white black-text"
                         style={{
                           marginRight: '0px',
                         }}
                       >
                         Rent
-                      </button>
+                      </td>
                     )}
                   </tr>
                 ))}
